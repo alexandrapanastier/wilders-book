@@ -1,7 +1,30 @@
-import axios from "axios";
-import { useState } from "react";
+import { useMutation, gql } from '@apollo/client';
+import { useState } from 'react';
+
+const ADD_WILDER = gql`
+  mutation AddWilder($name: String!) {
+    addWilder(name: $name) {
+      name
+    }
+  }
+`;
+
 const AddWilderForm = () => {
-  const [wilderName, setWilderName] = useState("");
+  const [wilderName, setWilderName] = useState('');
+  const [addWilder] = useMutation(ADD_WILDER);
+
+  const handleSave = async () => {
+    try {
+      await addWilder({
+        variables: { name: wilderName },
+      });
+      setWilderName('');
+      console.log('Wilder ajouté avec succès');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div>
       <input
@@ -11,19 +34,7 @@ const AddWilderForm = () => {
         }}
       />
       <br />
-      <button
-        onClick={async () => {
-          try {
-            await axios.post("http://localhost:5000/api/wilder", {
-              name: wilderName,
-            });
-          } catch (err) {
-            console.log(err);
-          }
-        }}
-      >
-        Save Wilder
-      </button>
+      <button onClick={handleSave}>Save Wilder</button>
     </div>
   );
 };
